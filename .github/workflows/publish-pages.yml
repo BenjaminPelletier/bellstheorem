@@ -1,0 +1,62 @@
+name: Publish GitHub Pages branch
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+
+# Complete each branch update and build request before the next publisher starts.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out current main
+        uses: actions/checkout@v6
+        with:
+          # A rerun of an older workflow must still publish current main.
+          ref: main
+
+      - name: Check simulator
+        run: |
+          node --check app.js
+          node --check physics.js
+          node tests/physics.test.cjs
+
+      - name: Replace gh-pages with one root commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_commit=$(git rev-parse HEAD)
+          publish_dir=$(mktemp -d "$RUNNER_TEMP/gh-pages.XXXXXX")
+          export GIT_INDEX_FILE="$publish_dir/index"
+
+          # Use a separate empty index; omit source-only and development files.
+          git read-tree --empty
+          touch .nojekyll
+          git add -- index.html styles.css app.js physics.js vendor LICENSE.md .nojekyll
+          if [[ -f CNAME ]]; then
+            git add -- CNAME
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          tree=$(git write-tree)
+          # No -p argument: every publication is a new root, never an append.
+          commit=$(printf 'Publish site from %s\n' "$source_commit" | git commit-tree "$tree")
+          test "$(git rev-list --count "$commit")" -eq 1
+          git push --force origin "$commit:refs/heads/gh-pages"
+
+      - name: Request GitHub Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # GITHUB_TOKEN pushes do not automatically trigger branch-based Pages builds.
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent

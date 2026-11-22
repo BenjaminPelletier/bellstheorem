@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0e171b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%2310191f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2218%22 fill=%22none%22 stroke=%22%238ee7c8%22 stroke-width=%225%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%226%22 fill=%22%23f35a61%22/%3E%3C/svg%3E">
+  <title>The lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/three.min.js"></script>
+  <script defer src="physics.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main class="workspace">
+    <section class="lab" aria-labelledby="lab-title">
+      <div class="lab-top"><h1 id="lab-title"><span class="live-dot"></span>The lab</h1><div class="view-tools"><button id="focus-source" class="text-button">Focus source</button><button id="reset-view" class="text-button">Fit rail</button><button id="sound" class="text-button" aria-pressed="true" title="Toggle release sound">Sound on</button></div></div>
+      <div id="viewport"><canvas id="scene" tabindex="0" aria-label="3D laboratory. Click the red source button to release particles. Click a detector disc to rotate it, drag a detector to move it, drag empty space to orbit, shift-drag to pan, and scroll to zoom. All detector settings are also available in the cards."></canvas><div id="labels" aria-hidden="true"></div><div id="scene-error" hidden>3D rendering is unavailable. Enable WebGL to see the apparatus. The cards and release button remain usable.</div><div class="scene-caption"><span id="scene-hint">Drag a detector onto the rail</span><span>DRAG TO ORBIT · SHIFT-DRAG TO PAN · SCROLL TO ZOOM</span></div></div>
+      <div class="experiment-bar"><button id="fire" class="fire-button"><span class="button-dot"></span>Release a pair <kbd>Space</kbd><span id="queue-badge" hidden></span></button></div>
+      <div class="readout" aria-live="polite" aria-atomic="true"><div class="readout-heading"><span>LAST OBSERVATION</span><output id="shot-count" aria-label="Pairs released">0</output></div><div id="last-result" class="muted">—</div></div>
+      <p id="announcement" class="sr-only" role="status"></p>
+    </section>
+    <aside class="controls" aria-label="Detector controls"><div class="control-heading"><h2>Detectors <span>10</span></h2><button id="place-all" class="small-button">Place all</button></div><div id="detector-controls"></div></aside>
+  </main>
+</body>
+</html>
